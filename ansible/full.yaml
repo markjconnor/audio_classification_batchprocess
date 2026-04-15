@@ -1,0 +1,62 @@
+---
+## 1. Global Package Installation
+#- hosts: all
+#  roles:
+#  - common
+#  - openmpi
+#  - nfs-packages
+#  - slurm-packages
+#  - beegfs-packages  # Integrated from beegfs.yaml
+#  - hostfile
+
+# 2. Assign Identity Roles
+- hosts: hostnode
+  roles:
+  - loginnodename
+  - mgmtnodename
+
+- hosts: workers
+  roles:
+  - workername
+
+# 3. Security & SSH Keys (Consolidated)
+- hosts: hostnode
+  roles: 
+  - commonkeys-server
+  - commonkeys-server-beegfs # Integrated from beegfs.yaml
+- hosts: workers
+  roles:
+  - commonkeys-clients
+  - commonkeys-clients-beegfs # Integrated from beegfs.yaml
+
+# 4. Shared Storage - NFS (Administrative/Home Directories)
+- hosts: hostnode
+  roles:
+  - nfs-server
+- hosts: workers
+  roles: 
+  - nfs-clients
+
+# 5. Parallel Storage - BeeGFS (High-Performance Data)
+- hosts: hostnode
+  roles: 
+  - beegfs-mgmt
+  - beegfs-md
+- hosts: workers
+  roles:
+  - beegfs-target
+# Note: Host is added to clients so you can view/submit data from the head node
+- hosts: hostnode:workers
+  roles:
+  - beegfs-client 
+
+# 6. Job Orchestration - Slurm
+- hosts: all
+  roles:
+  - slurm-config
+- hosts: hostnode
+  roles: 
+  - slurm-controller
+- hosts: workers
+  roles:
+  - slurm-worker
