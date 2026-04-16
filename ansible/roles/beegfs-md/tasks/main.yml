@@ -20,7 +20,14 @@
   become_user: root
 - name: Configure metadata
   ansible.builtin.command:
-    cmd: /opt/beegfs/sbin/beegfs-setup-meta -p /beegfs_data/md -m mgmtnode
+    cmd: /opt/beegfs/sbin/beegfs-setup-meta -p /beegfs_data/md -m hostnode
+  become: true
+  become_user: root
+- name: Enable SELinux extended attributes in BeeGFS Meta
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-meta.conf
+    regexp: '^storeClientXAttrs\s*='
+    line: 'storeClientXAttrs = true'
   become: true
   become_user: root
 - name: start medadata

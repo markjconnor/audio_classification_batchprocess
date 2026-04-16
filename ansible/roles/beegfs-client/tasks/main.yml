@@ -14,7 +14,7 @@
   become_user: root
 - name: Configure client
   ansible.builtin.command:
-    cmd: /opt/beegfs/sbin/beegfs-setup-client -m mgmtnode
+    cmd: /opt/beegfs/sbin/beegfs-setup-client -m hostnode
   become: true
   become_user: root
 - name: Mounts file
@@ -23,6 +23,13 @@
     dest: /etc/beegfs/beegfs-mounts.conf
     owner: root
     group: root
+  become: true
+  become_user: root
+- name: Enable SELinux support in BeeGFS Client
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-client.conf
+    regexp: '^sysSelinuxEnabled\s*='
+    line: 'sysSelinuxEnabled = true'
   become: true
   become_user: root
 - name: start client
