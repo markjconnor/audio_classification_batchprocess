@@ -1,19 +1,19 @@
 ---
 ## 1. Global Package Installation
-#- hosts: all
-#  roles:
-#  - common
-#  - openmpi
-#  - nfs-packages
-#  - slurm-packages
-#  - beegfs-packages  # Integrated from beegfs.yaml
-#  - hostfile
+- hosts: all
+  roles:
+  - common
+  - openmpi
+  - nfs-packages
+  - slurm-packages
+  - beegfs-packages  # Integrated from beegfs.yaml
+  - hostfile
 
-# 2. Assign Identity Roles
+# 2. Assign Identity Roles (REMOVE THIS IT BREAKS STUFF)
 - hosts: hostnode
   roles:
-  - loginnodename
-  - mgmtnodename
+ # - loginnodename
+ # - mgmtnodename
 
 - hosts: workers
   roles:
