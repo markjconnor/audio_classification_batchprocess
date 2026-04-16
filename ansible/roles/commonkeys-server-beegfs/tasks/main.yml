@@ -22,7 +22,7 @@
   register: certfile
   become: true
 - name: BeeGFS certs
-  ansible.builtin.shell: 'openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/beegfs/key.pem -out /etc/beegfs/cert.pem -config /root/san.cnf  -subj "/CN=mgmtnode"'
+  ansible.builtin.shell: 'openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/beegfs/key.pem -out /etc/beegfs/cert.pem -config /root/san.cnf  -subj "/CN=hostnode"'
   become: true
   become_user: root
   when: not certfile.stat.exists
