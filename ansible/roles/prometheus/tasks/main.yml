@@ -1,0 +1,47 @@
+- name: Install golang
+  ansible.builtin.dnf:
+    name: golang
+    state: latest
+  become: true
+
+- name: Install Prometheus and Node exporter
+  ansible.builtin.dnf:
+    name:
+      - golang-github-prometheus
+      - golang-github-prometheus-node-exporter
+    state: latest
+  become: true
+
+- name: Copy Prometheus service file
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/ansible/roles/prometheus/files/prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+  become: true
+
+- name: Read ips.json
+  ansible.builtin.set_fact:
+    ips_data: "{{ lookup('file', '/home/almalinux/comp0239_cw/ansible/ips.json') | from_json }}"
+
+- name: Extract worker IPs
+  ansible.builtin.set_fact:
+    worker_ips: "{{ ips_data[0].workers }}"
+
+- name: Render Prometheus config with worker targets
+  ansible.builtin.template:
+    src: /home/almalinux/comp0239_cw/ansible/roles/prometheus/files/prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Run prometheus
+  ansible.builtin.systemd:
+    name: prometheus
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+
