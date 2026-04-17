@@ -1,0 +1,47 @@
+- name: Ensure dataset directory exists on BeeGFS
+  ansible.builtin.file:
+    path: /beegfs/dataset
+    state: directory
+    mode: '0777'
+  become: true
+
+- name: Install unzip
+  ansible.builtin.dnf:
+    name: unzip
+    state: present
+  become: true
+
+- name: Read Kaggle credentials from local JSON file
+  ansible.builtin.set_fact:
+    kaggle_creds: "{{ lookup('file', 'kaggle.json') | from_json }}"
+  delegate_to: localhost
+  become: false
+
+- name: Stream dataset directly to BeeGFS using curl (Bypasses local /tmp)
+  ansible.builtin.command: >
+    curl -L -u "{{ kaggle_creds.username }}:{{ kaggle_creds.key }}" 
+    -o /beegfs/dataset/music-classification-wav.zip 
+    https://www.kaggle.com/api/v1/datasets/download/asisheriberto/music-classification-wav
+  args:
+    creates: /beegfs/dataset/music-classification-wav.zip
+  become: true
+
+- name: Extract dataset using native Linux unzip (Memory safe)
+  ansible.builtin.command:
+    cmd: unzip -q /beegfs/dataset/music-classification-wav.zip -d /beegfs/dataset/
+  args:
+    creates: /beegfs/dataset/wav_files # Assuming this is a folder inside the zip
+  become: true
+
+- name: Clean up the massive zip file to save storage space
+  ansible.builtin.file:
+    path: /beegfs/dataset/music-classification-wav.zip
+    state: absent
+  become: true
+
+- name: Generate the master list of wav files for Slurm
+  ansible.builtin.shell: 
+    cmd: find /beegfs/dataset/TRAIN_V2 -name "*.wav" > /beegfs/dataset/master_list.txt
+  args:
+    creates: /beegfs/dataset/master_list.txt  # Makes the task idempotent!
+  become: true
