@@ -5,6 +5,12 @@
     mode: '0755'
   become: true
 
+- name: Delete old Python ML script #TEMPORARY
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src/predict_single.py
+    state: absent
+  become: true
+
 - name: Copy the Python ML script
   ansible.builtin.copy:
     src: /home/almalinux/comp0239_cw/src/predict_single.py 
@@ -12,10 +18,24 @@
     mode: '0644'
   become: true
 
+- name: Delete old slurm bash script #TEMPORARY
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src/submit_bash_parallel.sh
+    state: absent
+  become: true
+
 - name: Copy the Slurm bash script 
   ansible.builtin.copy:
     src: /home/almalinux/comp0239_cw/src/submit_bash_parallel.sh
     dest: /home/almalinux/comp0239_cw/src/submit_bash_parallel.sh
+    mode: '0755' # Crucial: Makes the bash script executable
+  become: true
+  when: inventory_hostname in groups['hostnode']
+
+- name: Copy the launch script
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/src/launch_job.sh
+    dest: /home/almalinux/comp0239_cw/src/launch_job.sh
     mode: '0755' # Crucial: Makes the bash script executable
   become: true
   when: inventory_hostname in groups['hostnode']
