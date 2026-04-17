@@ -1,0 +1,21 @@
+- name: Ensure the destination directory exists
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Copy the Python ML script
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/src/predict_single.py 
+    dest: /home/almalinux/comp0239_cw/src/predict_single.py
+    mode: '0644'
+  become: true
+
+- name: Copy the Slurm bash script 
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/src/submit_bash_parallel.sh
+    dest: /home/almalinux/comp0239_cw/src/submit_bash_parallel.sh
+    mode: '0755' # Crucial: Makes the bash script executable
+  become: true
+  when: inventory_hostname in groups['hostnode']
