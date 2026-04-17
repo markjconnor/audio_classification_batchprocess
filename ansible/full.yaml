@@ -8,6 +8,7 @@
   - slurm-packages
   - beegfs-packages  # Integrated from beegfs.yaml
   - hostfile
+  - src-files 
 
 # 2. Assign Identity Roles (REMOVE THIS IT BREAKS STUFF)
 - hosts: hostnode
@@ -23,11 +24,9 @@
 - hosts: hostnode
   roles: 
   - commonkeys-server
-  - commonkeys-server-beegfs # Integrated from beegfs.yaml
 - hosts: workers
   roles:
   - commonkeys-clients
-  - commonkeys-clients-beegfs # Integrated from beegfs.yaml
 
 # 4. Shared Storage - NFS (Administrative/Home Directories)
 - hosts: hostnode
@@ -36,7 +35,6 @@
 - hosts: workers
   roles: 
   - nfs-clients
-
 # 5. Parallel Storage - BeeGFS (High-Performance Data)
 - hosts: hostnode
   roles: 
@@ -60,3 +58,8 @@
 - hosts: workers
   roles:
   - slurm-worker
+
+- hosts: hostnode
+  run_once: true
+  roles:
+  - dataset
