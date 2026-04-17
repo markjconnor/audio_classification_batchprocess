@@ -1,0 +1,31 @@
+- name: Initiate venv
+  ansible.builtin.command:
+    cmd: python3 -m venv /home/almalinux/music-venv
+  args:
+    creates: /home/almalinux/music-venv  # Makes this task idempotent!
+  become: true
+  become_user: almalinux
+
+- name: Ensure the destination directory exists
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src
+    state: directory
+    owner: almalinux    # <--- THE FIX: Explicitly assign ownership
+    group: almalinux    # <--- THE FIX
+    mode: '0755'
+  become: true
+
+- name: Copy the requirements file
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/src/requirements.txt
+    dest: /home/almalinux/comp0239_cw/src/requirements.txt
+    mode: '0644'
+  become: true
+  become_user: almalinux
+
+- name: Install requirements in venv
+  ansible.builtin.command:
+    # THE FIX: Added /src/ to the path to match where you copied it!
+    cmd: /home/almalinux/music-venv/bin/pip install -r /home/almalinux/comp0239_cw/src/requirements.txt
+  become: true
+  become_user: almalinux
