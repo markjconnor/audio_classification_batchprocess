@@ -1,18 +1,18 @@
-- name: Safely (lazy) unmount BeeGFS
-  ansible.builtin.command: umount -l /beegfs
-  become: true
-  become_user: root
-  # Ignore errors in case it is already unmounted
-  ignore_errors: true
-
-- name: Stop client service if it is running.
-  ansible.builtin.systemd_service:
-    name: beegfs-client
-    state: stopped
-    enabled: false
-  become: true
-  become_user: root
-  ignore_errors: true
+#- name: Safely (lazy) unmount BeeGFS
+#  ansible.builtin.command: umount -l /beegfs
+#  become: true
+#  become_user: root
+#  # Ignore errors in case it is already unmounted
+#  ignore_errors: true
+#
+#- name: Stop client service if it is running.
+#  ansible.builtin.systemd_service:
+#    name: beegfs-client
+#    state: stopped
+#    enabled: false
+#  become: true
+#  become_user: root
+#  ignore_errors: true
 - name: Create mount location
   ansible.builtin.file:
     path: /beegfs
