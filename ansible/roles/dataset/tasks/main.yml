@@ -17,6 +17,12 @@
   delegate_to: localhost
   become: false
 
+- name: Check if unzipped dataset already exists to avoid redundant download and extraction
+  ansible.builtin.stat:
+    path: /beegfs/dataset/TRAIN_V2
+  register: dataset_stat
+
+
 - name: Stream dataset directly to BeeGFS using curl (Bypasses local /tmp)
   ansible.builtin.command: >
     curl -L -u "{{ kaggle_creds.username }}:{{ kaggle_creds.key }}" 
@@ -24,13 +30,14 @@
     https://www.kaggle.com/api/v1/datasets/download/asisheriberto/music-classification-wav
   args:
     creates: /beegfs/dataset/music-classification-wav.zip
+  when: not dataset_stat.stat.exists
   become: true
 
 - name: Extract dataset using native Linux unzip (Memory safe)
   ansible.builtin.command:
     cmd: unzip -q /beegfs/dataset/music-classification-wav.zip -d /beegfs/dataset/
   args:
-    creates: /beegfs/dataset/wav_files # Assuming this is a folder inside the zip
+    creates: /beegfs/dataset/TRAIN_V2 # Assuming this is a folder inside the zip
   become: true
 
 - name: Clean up the massive zip file to save storage space
