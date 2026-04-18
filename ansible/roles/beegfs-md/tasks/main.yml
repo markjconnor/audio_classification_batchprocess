@@ -1,3 +1,17 @@
+- name: Stop metadata service if it is running.
+  ansible.builtin.systemd_service:
+    name: beegfs-meta
+    state: stopped
+    enabled: false
+  become: true
+  become_user: root
+  ignore_errors: true
+- name: Clean metadata location
+  ansible.builtin.file:
+    path: /beegfs_data/md
+    state: absent
+  become: true
+  become_user: root
 - name: Create metadata location
   ansible.builtin.file:
     path: /beegfs_data/md
@@ -7,13 +21,6 @@
 - name: Configure metadata
   ansible.builtin.command:
     cmd: /opt/beegfs/sbin/beegfs-setup-meta -p /beegfs_data/md -m hostnode
-  become: true
-  become_user: root
-- name: Enable SELinux extended attributes in BeeGFS Meta
-  ansible.builtin.lineinfile:
-    path: /etc/beegfs/beegfs-meta.conf
-    regexp: '^storeClientXAttrs\s*='
-    line: 'storeClientXAttrs = true'
   become: true
   become_user: root
 - name: start medadata
