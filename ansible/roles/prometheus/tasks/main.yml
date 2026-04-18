@@ -20,14 +20,6 @@
     group: root
   become: true
 
-- name: Read ips.json
-  ansible.builtin.set_fact:
-    ips_data: "{{ lookup('file', '/home/almalinux/comp0239_cw/ansible/ips.json') | from_json }}"
-
-- name: Extract worker IPs
-  ansible.builtin.set_fact:
-    worker_ips: "{{ ips_data[0].workers }}"
-
 - name: Render Prometheus config with worker targets
   ansible.builtin.template:
     src: /home/almalinux/comp0239_cw/ansible/roles/prometheus/files/prometheus.yml.j2
