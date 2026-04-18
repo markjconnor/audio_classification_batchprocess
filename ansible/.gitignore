@@ -1,3 +1,2 @@
-.terraform
 .generated
-*terraform*
+hosts

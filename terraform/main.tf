@@ -138,3 +138,15 @@ resource "harvester_virtualmachine" "workervm" {
   }
 
 }
+
+resource "local_file" "ansible_hosts" {
+  # 1. THE PATH: Where should Terraform save the file?
+  # This example assumes your 'ansible' folder is sitting right next to your terraform folder.
+  filename = "${path.module}/../ansible/hosts"
+
+  content = templatefile("${path.module}/hosts.tmpl", {
+    # 2. THE RESOURCES: These must match exactly what you named your VMs higher up in main.tf
+    host_ip    = harvester_virtualmachine.host[0].network_interface[0].ip_address
+    worker_ips = [for vm in harvester_virtualmachine.workervm : vm.network_interface[0].ip_address]
+  })
+}
