@@ -8,13 +8,6 @@
   - slurm-packages
   - beegfs-packages  # Integrated from beegfs.yaml
   - hostfile
-  - src-files 
-
-# 2. Assign Identity Roles (REMOVE THIS IT BREAKS STUFF)
-- hosts: hostnode
-  roles:
- # - loginnodename
- # - mgmtnodename
 
 - hosts: workers
   roles:
@@ -35,11 +28,12 @@
 - hosts: workers
   roles: 
   - nfs-clients
+
 # 5. Parallel Storage - BeeGFS (High-Performance Data)
 - hosts: hostnode
   roles: 
-  - beegfs-mgmt
-  - beegfs-md
+  - reset-beegfs-mgmt
+  - reset-beegfs-md
 - hosts: workers
   roles:
   - beegfs-target
@@ -63,3 +57,12 @@
   run_once: true
   roles:
   - dataset
+  - bash-scripts
+  - prometheus
+
+- hosts: workers
+  roles:
+  - prepare-worker-env
+  - node-exporter
+
+
