@@ -40,7 +40,7 @@
 - name: Start munge
   ansible.builtin.systemd_service:
     name: munge
-    state: started
+    state: restarted
     enabled: true
   become: true
   become_user: root
