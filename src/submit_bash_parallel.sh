@@ -2,7 +2,7 @@
 #SBATCH --job-name=bash_parallel
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2          # TODO: Change this to correct number of CPU cores
+#SBATCH --cpus-per-task=5          # TODO: Change this to correct number of CPU cores
 #SBATCH --array=0-99               # 100 total array jobs
 #SBATCH --output=/beegfs/almalinux/chunk_%a.out
 
@@ -34,7 +34,7 @@ for (( idx=start_idx; idx<=end_idx; idx++ )); do
     /home/almalinux/music-venv/bin/python3 predict_single.py "$current_file" &
 
     # Once we hit 4 parallel background jobs, wait for them to finish before continuing
-    if (( (idx - start_idx + 1) % 2 == 0 )); then #TODO: Change this to 4 for 4 parallel jobs
+    if (( (idx - start_idx + 1) % 5 == 0 )); then #TODO: Change this to 4 for 4 parallel jobs
         wait
     fi
 done
