@@ -1,17 +1,60 @@
-- name: Install golang
-  ansible.builtin.dnf:
-    name: golang
-    state: latest
+- name: Create Prometheus system user
+  ansible.builtin.user:
+    name: prometheus
+    shell: /sbin/nologin
+    system: true
+    create_home: false
   become: true
 
-- name: Install Prometheus and Node exporter
-  ansible.builtin.dnf:
-    name:
-      - golang-github-prometheus
-      - golang-github-prometheus-node-exporter
-    state: latest
+- name: Create Prometheus data directory
+  ansible.builtin.file:
+    path: /var/lib/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
   become: true
 
+- name: Create Prometheus config directory
+  ansible.builtin.file:
+    path: /etc/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  become: true
+
+- name: Download and extract Prometheus official binary
+  ansible.builtin.unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v2.45.0/prometheus-2.45.0.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: true
+  become: true
+
+- name: Move Prometheus binaries to /usr/bin
+  ansible.builtin.copy:
+    src: "/tmp/prometheus-2.45.0.linux-amd64/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    mode: '0755'
+    owner: root
+    group: root
+    remote_src: true
+  loop:
+    - prometheus
+    - promtool
+  become: true
+
+- name: Move console files to /etc/prometheus (Optional but recommended)
+  ansible.builtin.copy:
+    src: "/tmp/prometheus-2.45.0.linux-amd64/{{ item }}"
+    dest: "/etc/prometheus/{{ item }}"
+    owner: prometheus
+    group: prometheus
+    remote_src: true
+  loop:
+    - consoles
+    - console_libraries
+  become: true
 - name: Copy Prometheus service file
   ansible.builtin.copy:
     src: /home/almalinux/comp0239_cw/ansible/roles/prometheus/files/prometheus.service
