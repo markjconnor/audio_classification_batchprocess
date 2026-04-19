@@ -1,0 +1,49 @@
+- name: Create Node Exporter system user
+  ansible.builtin.user:
+    name: node_exporter
+    shell: /sbin/nologin
+    system: true
+    create_home: false
+  become: true
+
+- name: Download and extract Node Exporter
+  ansible.builtin.unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: true
+  become: true
+
+- name: Move Node Exporter binary to /usr/bin
+  ansible.builtin.copy:
+    src: /tmp/node_exporter-1.8.1.linux-amd64/node_exporter
+    dest: /usr/bin/node_exporter
+    mode: '0755'
+    owner: root
+    group: root
+    remote_src: true
+  become: true
+
+- name: Copy service file
+  ansible.builtin.copy:
+    src: /home/almalinux/ds4eng-cw/ansible/files/node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+  become: true
+
+- name: Create custom metrics directory
+  ansible.builtin.file:
+    path: /home/almalinux/custom_metrics
+    state: directory
+    owner: almalinux
+    group: almalinux
+    mode: '0755'
+  become: true
+
+- name: Start node exporter
+  ansible.builtin.systemd:
+    name: node_exporter
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
