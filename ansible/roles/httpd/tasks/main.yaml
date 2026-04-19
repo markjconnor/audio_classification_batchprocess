@@ -1,0 +1,30 @@
+- name: Install httpd
+  ansible.builtin.dnf:
+    name: httpd
+    state: latest
+  become: true
+
+- name: Copy website directory
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/website/
+    dest: /var/www/html/
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Give ownership of /var/www/html/data to almalinux
+  ansible.builtin.file:
+    path: /var/www/html/data
+    owner: almalinux
+    group: almalinux
+    recurse: true
+  become: true
+
+- name: Start httpd service
+  ansible.builtin.systemd:
+    name: httpd
+    enabled: true
+    state: started
+  become: true
+
