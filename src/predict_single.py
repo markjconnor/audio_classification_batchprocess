@@ -34,6 +34,8 @@ try:
     result = classifier(audio_input)
     
     infer_time = time.time() - start_infer
+    
+    # Updated print statement to match your new dictionary format!
     print(f"[{filename}] Result: {result[0]}")
     success = 1
 except Exception as e:
@@ -42,33 +44,59 @@ except Exception as e:
     success = 0
 
 # ---------------------------------------------------------
-# PROMETHEUS METRICS EXPORT
+# PROMETHEUS METRICS EXPORT (Cumulative Counter Pattern)
 # ---------------------------------------------------------
-# We use the Process ID (PID) so parallel jobs don't overwrite each other
-pid = os.getpid()
 metrics_dir = "/home/almalinux/custom_metrics"
-
-# Ensure the directory exists
 os.makedirs(metrics_dir, exist_ok=True)
 
-tmp_file = os.path.join(metrics_dir, f"audio_processing_{pid}.prom.tmp")
-prom_file = os.path.join(metrics_dir, f"audio_processing_{pid}.prom")
+# We use ONE single file per worker node now!
+prom_file = os.path.join(metrics_dir, "audio_processing_totals.prom")
+tmp_file = os.path.join(metrics_dir, "audio_processing_totals.prom.tmp")
 
-# Format the data according to Prometheus Textfile standards
-metric_data = f"""# HELP audio_model_load_time_seconds Time spent loading the model into RAM
-# TYPE audio_model_load_time_seconds gauge
-audio_model_load_time_seconds{{worker="{os.uname()[1]}", pid="{pid}"}} {load_time:.4f}
+# 1. Read the existing totals (if the file already exists)
+total_load_time = 0.0
+total_infer_time = 0.0
+total_processed = 0
+total_success = 0
 
-# HELP audio_inference_time_seconds Time spent classifying the audio
-# TYPE audio_inference_time_seconds gauge
-audio_inference_time_seconds{{worker="{os.uname()[1]}", pid="{pid}"}} {infer_time:.4f}
+if os.path.exists(prom_file):
+    with open(prom_file, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.startswith("audio_model_load_time_total_seconds"):
+                total_load_time = float(line.split()[1])
+            elif line.startswith("audio_inference_time_total_seconds"):
+                total_infer_time = float(line.split()[1])
+            elif line.startswith("audio_files_processed_total"):
+                total_processed = int(line.split()[1])
+            elif line.startswith("audio_files_success_total"):
+                total_success = int(line.split()[1])
 
-# HELP audio_processing_success Whether the classification succeeded (1) or failed (0)
-# TYPE audio_processing_success gauge
-audio_processing_success{{worker="{os.uname()[1]}", pid="{pid}"}} {success}
+# 2. Add the current run's metrics to the running total
+total_load_time += load_time
+total_infer_time += infer_time
+total_processed += 1
+total_success += success
+
+# 3. Format the new data as Prometheus Counters
+# Note: We append "_total" to the metric names, which is the Prometheus standard for Counters
+metric_data = f"""# HELP audio_model_load_time_total_seconds Cumulative time spent loading models
+# TYPE audio_model_load_time_total_seconds counter
+audio_model_load_time_total_seconds {total_load_time:.4f}
+
+# HELP audio_inference_time_total_seconds Cumulative time spent classifying audio
+# TYPE audio_inference_time_total_seconds counter
+audio_inference_time_total_seconds {total_infer_time:.4f}
+
+# HELP audio_files_processed_total Cumulative number of audio files processed
+# TYPE audio_files_processed_total counter
+audio_files_processed_total {total_processed}
+
+# HELP audio_files_success_total Cumulative number of successful classifications
+# TYPE audio_files_success_total counter
+audio_files_success_total {total_success}
 """
 
-# Atomic write and move
+# 4. Atomic write and move (Prevents Node Exporter from reading a half-written file)
 with open(tmp_file, "w", encoding="utf-8") as f:
     f.write(metric_data)
 shutil.move(tmp_file, prom_file)
