@@ -131,6 +131,13 @@ resource "harvester_virtualmachine" "workervm" {
     user_data_secret_name = harvester_cloudinit_secret.cloud-config.name
   }
 
+  tags = {
+    condenser_ingress_isEnabled = true
+    condenser_ingress_node_exporter_hostname = "${var.username}-node-exporter${format("%02d", count.index + 1)}"
+    condenser_ingress_node_exporter_port = 9100
+    condenser_ingress_node_exporter_protocol = "http"
+  }
+
   timeouts {
     create = "20m"
     update = "20m"
