@@ -5,6 +5,13 @@
     mode: '0777'
   become: true
 
+- name: Ensure results directory exists on BeeGFS
+  ansible.builtin.file:
+    path: /beegfs/results
+    state: directory
+    mode: '0777'
+  become: true
+
 - name: Install unzip
   ansible.builtin.dnf:
     name: unzip

@@ -1,4 +1,10 @@
-
+- name: Ensure the src directory exists
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src
+    state: directory
+    mode: '0755'
+  become: true
+  
 - name: Delete old slurm bash script #TEMPORARY
   ansible.builtin.file:
     path: /home/almalinux/comp0239_cw/src/submit_bash_parallel.sh
