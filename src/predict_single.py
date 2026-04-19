@@ -23,8 +23,7 @@ classifier = pipeline(
     model="dima806/music_genres_classification"
 )
 
-load_time = time.time() - start_load
-print(f"[{filename}] Model loaded in {load_time:.2f} seconds.")
+load_time = time.time() - start_load # model load time
 
 # 2. Measure Inference Time
 start_infer = time.time()
@@ -35,7 +34,7 @@ try:
     result = classifier(audio_input)
     
     infer_time = time.time() - start_infer
-    print(f"[{filename}] Result: {result[0]['label']} (Inference took {infer_time:.2f}s)")
+    print(f"[{filename}] Result: {result[0]}")
     success = 1
 except Exception as e:
     print(f"[{filename}] Failed to process: {e}")
