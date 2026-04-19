@@ -1,0 +1,5 @@
+- name: Set standard hostname for the Slurm Controller
+  ansible.builtin.hostname:
+    name: hostnode
+    use: systemd
+  become: true
