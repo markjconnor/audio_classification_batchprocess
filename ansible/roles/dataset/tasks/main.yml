@@ -43,13 +43,21 @@
   ansible.builtin.command:
     cmd: unzip -q /beegfs/dataset/music-classification-wav.zip -d /beegfs/dataset/
   args:
-    creates: /beegfs/dataset/TRAIN_V2 
+    creates: /beegfs/dataset/audio_files 
   become: true
 
 - name: Clean up the massive zip file to save storage space
   ansible.builtin.file:
     path: /beegfs/dataset/music-classification-wav.zip
     state: absent
+  become: true
+
+- name: Give ownership of the extracted dataset to almalinux
+  ansible.builtin.file:
+    path: /beegfs/dataset
+    owner: almalinux
+    group: almalinux
+    recurse: true
   become: true
 
 - name: Copy preprocess dataset file
@@ -59,12 +67,16 @@
     mode: '0755'
   become: true
 
+- name: Check if the dataset preprocessing script has already been run by looking for a .wav file in the target directory
+  ansible.builtin.stat:
+    path: /beegfs/dataset/audio_files/*.wav
+  register: preprocess_stat
+
 - name: Run the dataset preprocessing script
   ansible.builtin.command:
     cmd: python3 /home/almalinux/comp0239_cw/src/preprocess_dataset.py
-  args:
-    creates: /beegfs/dataset/audio_files  # FIX: Prevents the script from running twice
   become_user: almalinux                  # FIX: Ensures files are owned by almalinux, not root
+  when: not preprocess_stat.stat.exists         # FIX: Only run if .wav files don't already exist
 
 - name: Generate the master list of wav files for Slurm
   ansible.builtin.shell: 
