@@ -1,0 +1,13 @@
+[Unit]
+Description=Flask ML Dashboard
+After=network.target
+
+[Service]
+User=almalinux
+Group=almalinux
+WorkingDirectory=/home/almalinux/dashboard
+ExecStart=/home/almalinux/dashboard-venv/bin/python3 app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

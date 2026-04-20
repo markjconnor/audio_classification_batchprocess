@@ -65,7 +65,7 @@
   - dataset
   - bash-scripts
   - prometheus
-  - httpd
+  - dashboard
 
 - hosts: workers
   roles:

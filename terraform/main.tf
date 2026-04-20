@@ -70,14 +70,18 @@ resource "harvester_virtualmachine" "host" {
     user_data_secret_name = harvester_cloudinit_secret.cloud-config.name
   }
 
-  tags = {
+ tags = {
     condenser_ingress_isEnabled = true
+    
+    # Prometheus Configuration
     condenser_ingress_prometheus_hostname = "prometheus-${var.username}"
-    condenser_ingress_prometheus_port = 9090
+    condenser_ingress_prometheus_port     = 9090
     condenser_ingress_prometheus_protocol = "http"
-    condenser_ingress_httpd_hostname = "website-${var.username}"
-    condenser_ingress_httpd_port = 80
-    condener_ingress_httpd_protocol = "http"
+    
+    # Flask Dashboard Configuration
+    condenser_ingress_flask_hostname      = "dashboard-${var.username}"
+    condenser_ingress_flask_port          = 5000
+    condenser_ingress_flask_protocol      = "http"
   }
 
   timeouts {

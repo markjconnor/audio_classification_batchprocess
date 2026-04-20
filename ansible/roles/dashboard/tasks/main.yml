@@ -1,0 +1,69 @@
+- name: Ensure Python 3 and pip are installed
+  ansible.builtin.dnf:
+    name: 
+      - python3
+      - python3-pip
+    state: present
+  become: true
+
+# 2. Create the directory structure for the Flask app
+- name: Ensure dashboard directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: almalinux
+    group: almalinux
+    mode: '0755'
+  loop:
+    - /home/almalinux/dashboard
+    - /home/almalinux/dashboard/templates
+  become: true
+
+# 3. Create the isolated virtual environment and install Flask
+# We use become_user: almalinux so root doesn't own the Python packages
+- name: Create virtual environment and install Flask
+  ansible.builtin.pip:
+    name: flask
+    virtualenv: /home/almalinux/dashboard-venv
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: true
+  become_user: almalinux
+
+# 4. Deploy the backend script
+- name: Copy the Flask backend script (app.py)
+  ansible.builtin.copy:
+    src: /home/almalinux/dashboard/app.py
+    dest: /home/almalinux/dashboard/app.py
+    owner: almalinux
+    group: almalinux
+    mode: '0755'
+  become: true
+
+# 5. Deploy the frontend HTML
+- name: Copy the Frontend HTML (index.html)
+  ansible.builtin.copy:
+    src: /home/almalinux/dashboard/templates/index.html
+    dest: /home/almalinux/dashboard/templates/index.html
+    owner: almalinux
+    group: almalinux
+    mode: '0644'
+  become: true
+
+# 6. Deploy the Systemd service file
+- name: Copy dashboard systemd service file
+  ansible.builtin.copy:
+    src: dashboard.service
+    dest: /etc/systemd/system/dashboard.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+# 7. Start and enable the service to run on boot
+- name: Start and enable the dashboard service
+  ansible.builtin.systemd:
+    name: dashboard
+    enabled: true
+    state: restarted
+    daemon_reload: true
+  become: true

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio ML Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        /* The Genre Widgets Grid */
+        #genre-widgets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .widget {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: 150px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .widget:hover {
+            transform: translateY(-5px);
+            background: #e3f2fd;
+        }
+
+        .widget h3 {
+            margin: 0;
+            color: #2980b9;
+            text-transform: capitalize;
+        }
+
+        .widget p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+
+        /* The Track List */
+        #track-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .track-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .track-item:last-child {
+            border-bottom: none;
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .track-name {
+            font-weight: bold;
+        }
+
+        .track-score {
+            color: #27ae60;
+            font-size: 0.9em;
+        }
+
+        audio {
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Dataset Prediction Dashboard</h1>
+
+    <div id="genre-widgets"></div>
+
+    <div id="track-container">
+        <h2 id="selected-genre-title">Selected Genre</h2>
+        <div id="track-list"></div>
+    </div>
+
+    <script>
+        // 1. Load the Genre Widgets on Startup
+        async function loadGenres() {
+            const response = await fetch('/api/genres');
+            const genres = await response.json();
+            const widgetContainer = document.getElementById('genre-widgets');
+
+            genres.forEach(g => {
+                const widget = document.createElement('div');
+                widget.className = 'widget';
+                widget.innerHTML = `
+                    <h3>${g.prediction}</h3>
+                    <p>${g.count} files</p>
+                `;
+                // When clicked, load the tracks for this genre
+                widget.onclick = () => loadTracks(g.prediction);
+                widgetContainer.appendChild(widget);
+            });
+        }
+
+        // 2. Load the Tracks when a widget is clicked
+        async function loadTracks(genre) {
+            // Show the container and update title
+            document.getElementById('track-container').style.display = 'block';
+            document.getElementById('selected-genre-title').innerText = `Top Tracks for: ${genre}`;
+
+            const listContainer = document.getElementById('track-list');
+            listContainer.innerHTML = '<p>Loading tracks...</p>'; // Loading state
+
+            const response = await fetch(`/api/tracks/${genre}`);
+            const tracks = await response.json();
+
+            listContainer.innerHTML = ''; // Clear loading state
+
+            tracks.forEach(track => {
+                const percentage = (track.score * 100).toFixed(2);
+                const trackDiv = document.createElement('div');
+                trackDiv.className = 'track-item';
+                trackDiv.innerHTML = `
+                    <div class="track-info">
+                        <span class="track-name">${track.filename}</span>
+                        <span class="track-score">Confidence: ${percentage}%</span>
+                    </div>
+                    <audio controls preload="none">
+                        <source src="/audio/${track.filename}" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                `;
+                listContainer.appendChild(trackDiv);
+            });
+        }
+
+        // Boot up the app
+        loadGenres();
+    </script>
+</body>
+
+</html>
