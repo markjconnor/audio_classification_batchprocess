@@ -24,13 +24,12 @@
   delegate_to: localhost
   become: false
 
-- name: Check if unzipped dataset already exists to avoid redundant download and extraction
+- name: Check if unzipped dataset already exists to avoid redundant download
   ansible.builtin.stat:
     path: /beegfs/dataset/TRAIN_V2
   register: dataset_stat
 
-
-- name: Stream dataset directly to BeeGFS using curl (Bypasses local /tmp)
+- name: Stream dataset directly to BeeGFS using curl
   ansible.builtin.command: >
     curl -L -u "{{ kaggle_creds.username }}:{{ kaggle_creds.key }}" 
     -o /beegfs/dataset/music-classification-wav.zip 
@@ -40,11 +39,11 @@
   when: not dataset_stat.stat.exists
   become: true
 
-- name: Extract dataset using native Linux unzip (Memory safe)
+- name: Extract dataset using native Linux unzip
   ansible.builtin.command:
     cmd: unzip -q /beegfs/dataset/music-classification-wav.zip -d /beegfs/dataset/
   args:
-    creates: /beegfs/dataset/TRAIN_V2 # Assuming this is a folder inside the zip
+    creates: /beegfs/dataset/TRAIN_V2 
   become: true
 
 - name: Clean up the massive zip file to save storage space
@@ -53,9 +52,22 @@
     state: absent
   become: true
 
+- name: Copy preprocess dataset file
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/src/preprocess_dataset.py
+    dest: /home/almalinux/comp0239_cw/src/preprocess_dataset.py
+    mode: '0755'
+  become: true
+
+- name: Run the dataset preprocessing script
+  ansible.builtin.command:
+    cmd: python3 /home/almalinux/comp0239_cw/src/preprocess_dataset.py
+  args:
+    creates: /beegfs/dataset/audio_files  # FIX: Prevents the script from running twice
+  become_user: almalinux                  # FIX: Ensures files are owned by almalinux, not root
+
 - name: Generate the master list of wav files for Slurm
   ansible.builtin.shell: 
-    cmd: find /beegfs/dataset/TRAIN_V2 -name "*.wav" > /beegfs/dataset/master_list.txt
-  args:
-    creates: /beegfs/dataset/master_list.txt  # Makes the task idempotent!
+    cmd: find /beegfs/dataset/audio_files -name "*.wav" > /beegfs/dataset/master_list.txt
   become: true
+  become_user: almalinux
