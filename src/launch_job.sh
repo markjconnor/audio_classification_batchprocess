@@ -26,7 +26,7 @@ echo "Array Job Submitted with ID: $ARRAY_JOB_ID"
 
 # 5. Submit the Aggregator job with a strict dependency
 # 'afterany' ensures it runs after the array finishes, even if some chunks fail
-AGG_JOB_ID=$(sbatch --parsable --dependency=afterany:$ARRAY_JOB_ID aggregate.slurm)
+AGG_JOB_ID=$(sbatch --parsable --dependency=afterany:$ARRAY_JOB_ID aggregator.sh)
 
 echo "Aggregator Job Submitted with ID: $AGG_JOB_ID"
 echo "The aggregator will wait in the queue until the array is finished."

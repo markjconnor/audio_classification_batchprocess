@@ -18,6 +18,12 @@
     mode: '0755' # Crucial: Makes the bash script executable
   become: true
 
+- name: Delete old launch script #TEMPORARY
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src/launch_job.sh
+    state: absent
+  become: true
+
 - name: Copy the launch script
   ansible.builtin.copy:
     src: /home/almalinux/comp0239_cw/src/launch_job.sh
@@ -25,9 +31,15 @@
     mode: '0755' # Crucial: Makes the bash script executable
   become: true
 
+- name: Delete old aggregator script #TEMPORARY
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src/aggregator.sh
+    state: absent
+  become: true
+
 - name: Copy aggregator script
   ansible.builtin.copy:
-    src: /home/almalinux/comp0239_cw/src/aggregate_results.sh
-    dest: /home/almalinux/comp0239_cw/src/aggregate_results.sh
+    src: /home/almalinux/comp0239_cw/src/aggregator.sh
+    dest: /home/almalinux/comp0239_cw/src/aggregator.sh
     mode: '0755' # Crucial: Makes the bash script executable
   become: true
