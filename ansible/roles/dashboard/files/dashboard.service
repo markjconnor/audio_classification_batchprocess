@@ -6,7 +6,7 @@ After=network.target
 User=almalinux
 Group=almalinux
 WorkingDirectory=/home/almalinux/dashboard
-ExecStart=/home/almalinux/dashboard-venv/bin/python3 app.py
+ExecStart=/home/almalinux/dashboard-venv/bin/python3 /home/almalinux/dashboard/app.py
 Restart=always
 
 [Install]

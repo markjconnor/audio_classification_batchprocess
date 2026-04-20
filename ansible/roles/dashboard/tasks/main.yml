@@ -32,7 +32,7 @@
 # 4. Deploy the backend script
 - name: Copy the Flask backend script (app.py)
   ansible.builtin.copy:
-    src: /home/almalinux/dashboard/app.py
+    src: /home/almalinux/comp0239_cw/dashboard/app.py
     dest: /home/almalinux/dashboard/app.py
     owner: almalinux
     group: almalinux
@@ -42,7 +42,7 @@
 # 5. Deploy the frontend HTML
 - name: Copy the Frontend HTML (index.html)
   ansible.builtin.copy:
-    src: /home/almalinux/dashboard/templates/index.html
+    src: /home/almalinux/comp0239_cw/dashboard/templates/index.html
     dest: /home/almalinux/dashboard/templates/index.html
     owner: almalinux
     group: almalinux
@@ -57,6 +57,10 @@
     owner: root
     group: root
     mode: '0644'
+  become: true
+
+- name: Allow systemd to execute the virtual environment (SELinux Fix)
+  ansible.builtin.command: chcon -R -t bin_t /home/almalinux/dashboard-venv/bin
   become: true
 
 # 7. Start and enable the service to run on boot
