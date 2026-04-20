@@ -76,7 +76,7 @@
   ansible.builtin.systemd:
     name: prometheus
     enabled: true
-    state: started
+    state: restarted
     daemon_reload: true
   become: true
 
