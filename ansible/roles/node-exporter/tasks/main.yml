@@ -31,12 +31,6 @@
     group: root
   become: true
 
-- name: Delete custom metrics directory if it exists #TEMPORARY
-  ansible.builtin.file:
-    path: /home/almalinux/custom_metrics
-    state: absent
-  become: true
-
 - name: Create custom metrics directory
   ansible.builtin.file:
     path: /home/almalinux/custom_metrics
