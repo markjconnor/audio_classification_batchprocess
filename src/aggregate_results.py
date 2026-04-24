@@ -62,43 +62,7 @@ def parse_and_store_results(log_dir):
     session.close()
     print(f"Success! Inserted/Updated {total_inserted} records into the database.")
 
-def reset_metrics():
-    metrics_dir = "/home/almalinux/custom_metrics"
-    
-    # Ensure directory exists before we try to write to it
-    os.makedirs(metrics_dir, exist_ok=True)
-    
-    prom_file = os.path.join(metrics_dir, "audio_processing_totals.prom")
-    tmp_file = os.path.join(metrics_dir, "audio_processing_totals.prom.tmp")
-
-    # Use 0.0 for the time counters to maintain float formatting
-    metric_data = f"""# HELP audio_model_load_time_total_seconds Cumulative time spent loading models
-    # TYPE audio_model_load_time_total_seconds counter
-    audio_model_load_time_total_seconds 0.0
-
-    # HELP audio_inference_time_total_seconds Cumulative time spent classifying audio
-    # TYPE audio_inference_time_total_seconds counter
-    audio_inference_time_total_seconds 0.0
-
-    # HELP audio_files_processed_total Cumulative number of audio files processed
-    # TYPE audio_files_processed_total counter
-    audio_files_processed_total 0
-
-    # HELP audio_files_success_total Cumulative number of successful classifications
-    # TYPE audio_files_success_total counter
-    audio_files_success_total 0
-    """
-
-    # Atomic write and move
-    with open(tmp_file, "w", encoding="utf-8") as f:
-        f.write(metric_data)
-    shutil.move(tmp_file, prom_file)
-    print("Prometheus metrics successfully reset to 0.")
-
-# ... (the rest of your aggregator code) ...
-
 if __name__ == "__main__":
     LOG_DIRECTORY = "/beegfs/almalinux/"
     parse_and_store_results(LOG_DIRECTORY)
-    reset_metrics()
     
