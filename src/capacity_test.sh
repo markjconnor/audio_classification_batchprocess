@@ -38,7 +38,7 @@ for i in $(seq 1 $ITERATIONS); do
 done
 
 # 4. Chain the Database Aggregator to the very last iteration
-AGG_JOB_ID=$(sbatch --parsable --dependency=afterany:$PREV_JOB_ID aggregate.sh)
+AGG_JOB_ID=$(sbatch --parsable --dependency=afterany:$PREV_JOB_ID aggregator.sh)
 
 echo "========================================="
 echo "Capacity Test Fully Queued!"
