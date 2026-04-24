@@ -43,3 +43,16 @@
     dest: /home/almalinux/comp0239_cw/src/aggregator.sh
     mode: '0755' # Crucial: Makes the bash script executable
   become: true
+
+- name: Delete old capacity test script #TEMPORARY
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src/capacity_test.sh
+    state: absent
+  become: true
+
+- name: Copy capacity test script
+  ansible.builtin.copy:
+    src: /home/almalinux/comp0239_cw/src/capacity_test.sh
+    dest: /home/almalinux/comp0239_cw/src/capacity_test.sh
+    mode: '0755' # Crucial: Makes the bash script executable
+  become: true
