@@ -4,10 +4,10 @@
     state: latest
   become: true
   become_user: root
-- name: Kernel source
+- name: Kernel source (Matched to running kernel)
   ansible.builtin.dnf:
-    name: "kernel-devel"
-    state: latest
+    name: "kernel-devel-{{ ansible_kernel }}"
+    state: present
   become: true
   become_user: root
 - name: BeeGFS Repo
