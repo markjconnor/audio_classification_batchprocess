@@ -39,6 +39,15 @@
     line: 'sysSelinuxEnabled = true'
   become: true
   become_user: root
+- name: Install kernel development dependencies for BeeGFS autobuild
+  ansible.builtin.dnf:
+    name: 
+      - gcc
+      - make
+      - elfutils-libelf-devel
+      - "kernel-devel-{{ ansible_kernel }}"
+    state: present
+  become: true
 - name: start client
   ansible.builtin.systemd_service:
     name: beegfs-client
