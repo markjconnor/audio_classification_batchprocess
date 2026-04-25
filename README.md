@@ -53,6 +53,28 @@ vim ~/comp0239_cw/ansible/hosts
 ```
 *(Save and exit the file).*
 
+## Dataset Credentials (Kaggle)
+The pipeline requires access to Kaggle to securely stream the audio dataset to the BeeGFS file system.
+
+Before running Ansible, you must provide your Kaggle API credentials:
+
+1. On the host machine, navigate to the dataset role's files directory:
+
+```Bash
+cd ~/comp0239_cw/ansible/roles/dataset/files/
+```
+2. Open or create the kaggle.json file:
+
+```Bash
+nano kaggle.json
+```
+3. Paste your credentials into the file using the following JSON format:
+
+```JSON
+{"username":"YOUR_KAGGLE_USERNAME","key":"YOUR_KAGGLE_API_KEY"}
+```
+(Save and exit the file).
+
 ## Configuration (Ansible)
 Once the hosts file is securely on the host node, you can configure the cluster.
 
