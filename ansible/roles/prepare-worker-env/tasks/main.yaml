@@ -15,12 +15,6 @@
     mode: '0755'
   become: true
 
-- name: Delete old requirements file #TEMPORARY 
-  ansible.builtin.file:
-    path: /home/almalinux/comp0239_cw/src/requirements.txt
-    state: absent
-  become: true
-
 - name: Copy the requirements file
   ansible.builtin.copy:
     src: /home/almalinux/comp0239_cw/src/requirements.txt
@@ -36,11 +30,6 @@
   become: true
   become_user: almalinux
 
-- name: Delete old Python ML script #TEMPORARY
-  ansible.builtin.file:
-    path: /home/almalinux/comp0239_cw/src/predict_single.py
-    state: absent
-  become: true
 
 - name: Copy the Python ML script
   ansible.builtin.copy:
@@ -49,11 +38,6 @@
     mode: '0644'
   become: true
 
-- name: Delete old Python aggregate results script #TEMPORARY
-  ansible.builtin.file:
-    path: /home/almalinux/comp0239_cw/src/aggregate_results.py
-    state: absent
-  become: true
 
 - name: Copy the aggregate results script
   ansible.builtin.copy:
