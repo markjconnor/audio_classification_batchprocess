@@ -2,7 +2,7 @@
 #SBATCH --job-name=bash_parallel
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2          # TODO: Change this to correct number of CPU cores
+#SBATCH --cpus-per-task=5          # TODO: Change this to correct number of CPU cores
 #SBATCH --array=0-99               # default to 100 jobs
 #SBATCH --output=/beegfs/almalinux/chunk_%a.out
 
