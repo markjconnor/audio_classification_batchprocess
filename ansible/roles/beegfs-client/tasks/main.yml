@@ -45,7 +45,7 @@
       - gcc
       - make
       - elfutils-libelf-devel
-      - "kernel-devel-{{ ansible_kernel }}"
+      - "kernel-devel"
     state: present
   become: true
 - name: start client

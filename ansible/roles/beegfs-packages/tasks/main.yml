@@ -6,7 +6,7 @@
   become_user: root
 - name: Kernel source (Matched to running kernel)
   ansible.builtin.dnf:
-    name: "kernel-devel-{{ ansible_kernel }}"
+    name: "kernel-devel"
     state: present
   become: true
   become_user: root
