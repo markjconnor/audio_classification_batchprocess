@@ -25,7 +25,7 @@
 
 - name: Copy service file
   ansible.builtin.copy:
-    src: /home/almalinux/comp0238_cw/ansible/files/node_exporter.service
+    src: /home/almalinux/comp0239_cw/ansible/files/node_exporter.service
     dest: /etc/systemd/system/node_exporter.service
     owner: root
     group: root
