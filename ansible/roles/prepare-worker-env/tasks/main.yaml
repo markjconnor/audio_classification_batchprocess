@@ -30,6 +30,11 @@
   become: true
   become_user: almalinux
 
+- name: Delete Python ML script
+  ansible.builtin.file:
+    path: /home/almalinux/comp0239_cw/src/predict_single.py
+    state: absent
+  become: true
 
 - name: Copy the Python ML script
   ansible.builtin.copy:
@@ -37,7 +42,6 @@
     dest: /home/almalinux/comp0239_cw/src/predict_single.py
     mode: '0644'
   become: true
-
 
 - name: Copy the aggregate results script
   ansible.builtin.copy:
