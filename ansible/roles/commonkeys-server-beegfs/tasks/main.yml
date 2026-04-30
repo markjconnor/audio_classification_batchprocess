@@ -1,6 +1,7 @@
-
 - name: Generate connauthfile
   local_action: ansible.builtin.command dd if=/dev/random of=./.generated/connauthfile bs=128 count=1
+  args:
+    creates: ./.generated/connauthfile
 - name: Auth file
   ansible.builtin.copy:
     src: ./.generated/connauthfile

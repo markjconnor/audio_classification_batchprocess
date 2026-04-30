@@ -54,8 +54,6 @@
     path: /etc/beegfs/beegfs-client.conf
     regexp: '^connAuthFile\s*='
     line: 'connAuthFile = /etc/beegfs/conn.auth'
-  loop:
-    - client    # Put this in beegfs-client.yml
   become: true
   become_user: root
 - name: start client

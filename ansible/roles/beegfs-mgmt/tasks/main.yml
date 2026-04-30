@@ -17,6 +17,13 @@
     cmd: /opt/beegfs/sbin/beegfs-mgmtd --init
   become: true
   become_user: root
+- name: Configure mgmtd to use auth secret (TOML format)
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-mgmtd.toml
+    regexp: '^#?\s*conn_auth_file\s*='
+    line: 'conn_auth_file = "/etc/beegfs/conn.auth"'
+  become: true
+  become_user: root
 - name: start mgmtd
   ansible.builtin.systemd_service:
     name: beegfs-mgmtd
