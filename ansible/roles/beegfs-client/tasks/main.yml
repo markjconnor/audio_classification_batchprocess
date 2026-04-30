@@ -48,6 +48,16 @@
       - "kernel-devel"
     state: present
   become: true
+  
+- name: Configure service to use auth secret
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-client.conf
+    regexp: '^connAuthFile\s*='
+    line: 'connAuthFile = /etc/beegfs/conn.auth'
+  loop:
+    - client    # Put this in beegfs-client.yml
+  become: true
+  become_user: root
 - name: start client
   ansible.builtin.systemd_service:
     name: beegfs-client

@@ -23,7 +23,14 @@
     cmd: /opt/beegfs/sbin/beegfs-setup-meta -p /beegfs_data/md -m hostnode
   become: true
   become_user: root
-- name: start medadata
+- name: Configure service to use auth secret
+  ansible.builtin.lineinfile:
+    path: /etc/beegfs/beegfs-meta.conf
+    regexp: '^connAuthFile\s*='
+    line: 'connAuthFile = /etc/beegfs/conn.auth'
+  become: true
+  become_user: root
+- name: start metadata
   ansible.builtin.systemd_service:
     name: beegfs-meta
     state: started
