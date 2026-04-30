@@ -33,7 +33,7 @@ for (( idx=start_idx; idx<=end_idx; idx++ )); do
     current_file=${files[$idx]}
     
     # Launch Python in the background (&)
-    /home/almalinux/music-venv/bin/python3 predict_single.py "$current_file" &
+    /home/almalinux/music-venv/bin/python3 /home/almalinux/comp0239_cw/src/predict_single.py "$current_file" &
 
     # Once we hit 4 parallel background jobs, wait for them to finish before continuing
     if (( (idx - start_idx + 1) % PARALLEL_WORKERS == 0 )); then #TODO: Change this to 4 for 4 parallel jobs
