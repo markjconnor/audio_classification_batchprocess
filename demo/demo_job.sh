@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MASTER_LIST="/beegfs/dataset/demo_master_list.txt"
-BATCH_SIZE=100
+BATCH_SIZE=10
 
 echo "Cleaning up old data for a fresh capacity test..."
 rm -f /beegfs/almalinux/chunk_*.out
